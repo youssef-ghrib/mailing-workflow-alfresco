@@ -1,0 +1,2 @@
+Copy the model courrierArrive-model-context.xml and courrierDepart-model-context.xml to
+[alfresco directory]\tomcat\shared\classes\alfresco\extension
