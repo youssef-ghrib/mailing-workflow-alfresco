@@ -9,14 +9,14 @@
 
 ## Screenshots
 
-![1](/GEC-Screenshots/1.png?raw=true)
-![2](/GEC-Screenshots/2.png?raw=true)
-![3](/GEC-Screenshots/3.png?raw=true)
-![4](/GEC-Screenshots/4.png?raw=true)
-![5](/GEC-Screenshots/5.png?raw=true)
-![6](/GEC-Screenshots/6.png?raw=true)
-![7](/GEC-Screenshots/7.png?raw=true)
-![8](/GEC-Screenshots/8.png?raw=true)
-![9](/GEC-Screenshots/9.png?raw=true)
-![10](/GEC-Screenshots/10.png?raw=true)
-![11](/GEC-Screenshots/11.png?raw=true)
+<img src="/GEC-Screenshots/1.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/2.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/3.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/4.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/5.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/6.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/7.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/8.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/9.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/10.png" width="50%" height="50%"/>
+<img src="/GEC-Screenshots/11.png" width="50%" height="50%"/>
