@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:metadata>
+	<f:viewAction action="#{courrierArriveMB.initTags}" />
+	
+</f:metadata>
+<h:head>
+<h:outputStylesheet  >
+.ouss {
+
+  position:absolute !important;
+  left:100px!important;
+  top:20px !important;
+}
+</h:outputStylesheet>
+</h:head>
+<h:body>
+
+   
+   
+<h:form  id="form" >   
+<p:poll interval="4"  autoStart="true"  listener="#{notificationMB.execute}" />
+</h:form>
+ 
+
+ 
+
+
+  
+
+
+</h:body>
+</html>

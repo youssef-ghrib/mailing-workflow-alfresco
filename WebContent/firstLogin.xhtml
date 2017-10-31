@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	 xmlns:ui="http://java.sun.com/jsf/facelets"   
+	>
+
+
+<h:head>
+</h:head>
+<h:body style="background-color:#BBBBBB;">
+	<h:form>
+	
+		<p:panel id="login" header="Change password" style="width:450px;position:absolute;right:450px;top:200px;">
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel for="oldPassword" value="#{lang['old_password']}"    />
+				<h:panelGrid columns="1" >
+				<p:inputText id="oldPassword" value="#{employeMB.oldPassword}" validator="#{employeMB.verifyPassword}" validatorMessage="#{lang['incorrect_password']}"  requiredMessage="#{lang['required_password']}" 
+					required="true" label="oldPassword" />
+				<p:message for="oldPassword" />
+				</h:panelGrid>
+				<h:outputLabel for="newPassword" value="#{lang['new_password']}" />
+				<h:panelGrid columns="1" >
+				<p:password id="newPassword" match="again" value="#{employeMB.newPassword}"  validatorMessage="#{lang['not_match']}" 
+					required="true" label="newPassword"  requiredMessage="#{lang['required_password']}"/>
+					<p:message for="newPassword" />
+					</h:panelGrid>
+					<h:outputLabel for="again" value="#{lang['retype_password']}" />
+				<h:panelGrid columns="1" >
+				<p:password id="again" value="#{employeMB.again}" requiredMessage="#{lang['required_password']}"
+					required="true" label="again" />
+	<p:message for="again" />
+			</h:panelGrid>
+			</h:panelGrid>
+			<h:panelGrid columns="1" cellpadding="5">
+			<p:commandButton  value="#{lang['change_password']}" update="@form"
+					action="#{employeMB.changer}"  />
+    		
+			</h:panelGrid>
+			
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

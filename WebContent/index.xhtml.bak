@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+	<f:metadata>
+	<f:viewAction action="#{courrierArriveMB.initBoiteReception}" />
+	<f:viewAction action="#{courrierArriveMB.initAlfresco}" />
+	<f:viewAction action="#{courrierArriveMB.initSelectOneMenu}" />
+</f:metadata>
+<h:head>
+	<link href="#{resource['css/style.css']}" rel="stylesheet" type="text/css"/> 
+</h:head>
+<h:body>
+	<p:layout fullPage="true">
+		<p:layoutUnit position="north">
+			<h:form>
+				<img src="logo.png" height="50" width="50"
+					style="margin-left: 50px;" />
+				<p:toolbar>
+					<f:facet name="left">
+					Gestion Eletronique de Courriers
+					</f:facet>
+					<f:facet name="right">
+						<p:menuButton value="#{connexion.employe.username} (#{connexion.employe.serviceInt.nom})">
+			
+<p:menuitem value=" Parametre du compte " icon="ui-icon-extlink"  outcome="/restreint/gererCompte/manageAccount"/>
+<p:menuitem value=" Parametre de Systeme " icon="ui-icon-extlink"  outcome="/restreint/parametreSystem/parametre" rendered="#{connexion.employe.role=='ADMIN'}"/>
+				<p:separator />
+				
+					<p:menuitem value="Deconnexion" action="#{connexion.logout}"
+					icon="ui-icon-disk" />
+			</p:menuButton>
+					</f:facet>
+				</p:toolbar>
+			</h:form>
+		</p:layoutUnit>
+		<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="© Oratech Consulting 2015. Tous les droits réservés." />
+		</p:layoutUnit>
+		<p:layoutUnit position="west" size="300">
+			<ui:include src="/presets/menu.xhtml" />
+		</p:layoutUnit>
+		<p:layoutUnit position="center">
+			<h:form id="form">
+				<h2 style="color: #999999">Boite de reception</h2>
+				<h:panelGrid
+					rendered="#{courrierArriveMB.courriersArrives.size()==0}"
+					columns="1" width="100%">
+					<p:separator />
+					<h:panelGrid columns="3">
+						<p:spacer width="150"></p:spacer>
+						<p:graphicImage value="#{resource['icons/courrier.png']}"
+							style="opacity:0.5">
+						</p:graphicImage>
+						<h3
+							style="text-align: center; margin-left: auto; margin-right: auto; color: #999999;">
+							Aucun courrier Arrivé trouvé dans la boite de reception</h3>
+					</h:panelGrid>
+
+
+					<p:separator />
+				</h:panelGrid>
+				<p:dataTable id="table" var="courrier"
+					rendered="#{courrierArriveMB.courriersArrives.size()!=0}"
+					value="#{courrierArriveMB.courriersArrives}">
+
+					<p:column headerText="Ref" style="text-align: center">
+						<h:outputText value="#{courrier.ref}" />
+					</p:column>
+
+					<p:column headerText="objet" style="text-align: center">
+						<h:outputText value="#{courrier.objet}" />
+					</p:column>
+
+					<p:column headerText="Date Réception" style="text-align: center">
+						<h:outputText value="#{courrier.dateReception}">
+							<f:convertDateTime pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column>
+						<h:outputText
+							value="#{courrierArriveMB.getLastUser(courrier.ref).username}"></h:outputText>
+					</p:column>
+
+					<p:column headerText="Actions" style="text-align: center">
+						<p:commandButton icon="ui-icon-mail-open" update=":form:dialog4"
+							oncomplete="PF('dlg4').show();"
+							actionListener="#{courrierArriveMB.getAttribute}">
+							<f:attribute name="selectedItem" value="#{courrier}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:dialog id="dialog" widgetVar="dlg" minHeight="600"
+					appendTo="@(body)">
+					<h:panelGrid columns="1">
+						<h:outputLabel for="commentaires" value="Commentaires:" />
+						<p:inputTextarea id="commentaires"
+							value="#{courrierArriveMB.commentaires}" />
+						<p:commandButton icon="ui-icon-unlocked"
+							oncomplete="PF('dlg').hide();PF('dlg4').hide();"
+							actionListener="#{courrierArriveMB.unlock}" update="table" />
+					</h:panelGrid>
+				</p:dialog>
+				<p:dialog id="dialog2" widgetVar="dlg2" minHeight="600"
+					appendTo="@(body)">
+					<h:panelGrid columns="1">
+						<h:outputLabel for="commentairesT" value="Commentaires:" />
+						<p:inputTextarea id="commentairesT"
+							value="#{courrierArriveMB.commentaires}" />
+						<p:commandButton icon="ui-icon-check"
+							onclick="PF('dlg2').hide();PF('dlg4').hide();"
+							actionListener="#{courrierArriveMB.traiter}" update="table" />
+					</h:panelGrid>
+				</p:dialog>
+				<p:dialog id="dialog3" widgetVar="dlg3" minHeight="600"
+					appendTo="@(body)">
+					<h:panelGrid id="azerty" columns="2" cellpadding="10">
+						<p:outputLabel for="radio" value="Type de destinataire:" />
+						<p:selectOneRadio id="radio" value="#{courrierArriveMB.radio}">
+							<p:ajax event="change" update="azerty" />
+							<f:selectItem itemLabel="Service" itemValue="service" />
+							<f:selectItem itemLabel="Personne" itemValue="personne" />
+						</p:selectOneRadio>
+						<h:outputLabel for="serviceInterne" value="Service:" />
+						<p:selectOneMenu id="serviceInterne"
+							value="#{courrierArriveMB.courrierArrive.serviceIntDest}"
+							converter="serviceConverter" style="width:226px">
+							<p:ajax listener="#{courrierArriveMB.onServiceInterneChange()}"
+								update="employe" />
+							<f:selectItem itemValue="" itemLabel="selectionner un service"></f:selectItem>
+							<f:selectItems value="#{courrierArriveMB.servicesInternes}"
+								var="service" itemLabel="#{service.nom}" itemValue="#{service}" />
+						</p:selectOneMenu>
+						<h:outputLabel for="employe" value="Employe:"
+							rendered="#{courrierArriveMB.radio=='personne'}" />
+						<p:selectOneMenu id="employe"
+							rendered="#{courrierArriveMB.radio=='personne'}"
+							value="#{courrierArriveMB.courrierArrive.empDest}"
+							converter="employeConverter" style="width:226px">
+							<f:selectItem itemValue="" itemLabel="selectionner un personne"></f:selectItem>
+							<f:selectItems value="#{courrierArriveMB.employes}" var="employe"
+								itemLabel="#{employe.nom}" itemValue="#{employe}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<p:commandButton icon="ui-icon-mail-closed"
+						onclick="PF('dlg3').hide();PF('dlg4').hide();"
+						actionListener="#{courrierArriveMB.send}" update="table" />
+				</p:dialog>
+
+				<p:dialog id="historique" widgetVar="pnl" appendTo="@(body)"
+					header="Historique du courrier" hideEffect="fade" dynamic="true"
+					style="width:100%">
+					<h:panelGrid columns="1" cellpadding="10" width="100%">
+						<h:panelGrid columns="2">
+							<h:outputText value="Reference" />
+							<h:outputText value="#{courrierArriveMB.courrierArrive.ref}" />
+							<h:outputText value="Objet" />
+							<h:outputText value="#{courrierArriveMB.courrierArrive.objet}" />
+
+							<h:outputText value="Date de reception" />
+							<h:outputText
+								value="#{courrierArriveMB.courrierArrive.dateReception}">
+								<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+							</h:outputText>
+						</h:panelGrid>
+						<p:dataTable value="#{courrierArriveMB.historiques}" id="tt"
+							var="historique">
+							<p:column headerText="Service">
+								<h:outputText value="#{historique.employe.serviceInt.nom}" />
+							</p:column>
+							<p:column headerText="Employe">
+								<h:outputText value="#{historique.employe.nom}" />
+							</p:column>
+							<p:column headerText="Date de reception">
+								<h:outputText value="#{historique.dateReception}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Commentaires">
+								<h:outputText value="#{historique.commentaires}" />
+							</p:column>
+
+							<p:column headerText="Date fin de traitement">
+								<h:outputText value="#{historique.dateFinTraitement}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="Status de courrier">
+								<h:outputText value="#{historique.statut}" />
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+				</p:dialog>
+				<p:dialog id="dialog4" widgetVar="dlg4" minWidth="800" modal="true"
+					appendTo="@(body)" style="width:800px;">
+
+					<div class="ui-grid">
+
+						<div class="ui-grid-col-6">
+							<h:panelGrid columns="1" width="800">
+								<h:panelGrid columns="2" cellpadding="5">
+									<h:outputLabel for="ref" value="Ref:" styleClass="textHeader" />
+									<h:outputLabel id="ref"
+										value="#{courrierArriveMB.courrierArrive.ref}" />
+									<h:outputLabel for="objet" value="Objet:"
+										styleClass="textHeader" />
+									<h:outputLabel id="objet"
+										value="#{courrierArriveMB.courrierArrive.objet}" />
+									<h:outputLabel for="priorite" value="Priorité:"
+										styleClass="textHeader" />
+									<h:outputLabel id="priorite"
+										value="#{courrierArriveMB.courrierArrive.priorite}" />
+									<h:outputLabel for="dateReception" value="Date réception:"
+										styleClass="textHeader" />
+									<h:outputLabel id="dateReception"
+										value="#{courrierArriveMB.courrierArrive.dateReception}" />
+									<h:outputLabel for="tags" value="TAGs:" styleClass="textHeader" />
+									<h:outputLabel id="tags"
+										value="#{courrierArriveMB.courrierArrive.tags}" />
+
+								</h:panelGrid>
+								<h:panelGrid columns="1" cellpadding="5"
+									style="margin-top:60px;">
+
+									<h:outputLabel value="Actions:" styleClass="textHeader" />
+									<h:panelGrid columns="4" cellpadding="2">
+										<p:commandButton icon="ui-icon-unlocked" update=":form:dialog"
+											value="Liberer" oncomplete="PF('dlg').show();">
+
+										</p:commandButton>
+										<p:commandButton icon="ui-icon-check" update=":form:dialog2"
+											oncomplete="PF('dlg2').show();" value="Traiter">
+
+										</p:commandButton>
+										<p:commandButton icon="ui-icon-mail-closed"
+											update=":form:dialog3" oncomplete="PF('dlg3').show();"
+											value="Envoyer">
+
+										</p:commandButton>
+
+
+										<p:commandButton icon="ui-icon-document" value="Historiques"
+											oncomplete="PF('pnl').show();"
+											actionListener="#{courrierArriveMB.voirHistorique}"
+											update=":form:historique">
+
+										</p:commandButton>
+									</h:panelGrid>
+								</h:panelGrid>
+							</h:panelGrid>
+						</div>
+						<div class="ui-grid-col-6">
+							<object type="application/pdf" height="400" width="100%"
+								data="http://localhost:8080/alfresco/service/api/node/content/#{courrierArriveMB.fichier.chemin}?alf_ticket=#{courrierArriveMB.getTicket()}">
+								Your browser can't display pdf, <a
+									href="/resources/demo/media/guide.pdf">click</a> to download
+								pdf instead.
+							</object>
+
+						</div>
+					</div>
+				</p:dialog>
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

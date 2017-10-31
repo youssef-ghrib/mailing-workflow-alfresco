@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    
+    
+    
+   xmlns:f="http://xmlns.jcp.org/jsf/core"
+     xmlns:c="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+     
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+  >
+   <c:metadata>
+	<f:viewAction action="#{employeMB.initEmploye}" />
+</c:metadata>
+
+<h:head>
+
+</h:head>
+
+
+<h:body>
+	<p:layout fullPage="true">	<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" resizable="true" size="100"
+			minSize="40" maxSize="200">
+			<ui:include src="/presets/header.xhtml"/>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west">
+<ui:include src="/presets/accountMenu.xhtml"/>
+		</p:layoutUnit>
+
+		
+		
+
+		<p:layoutUnit position="center">
+			<h:form>
+			<h2> #{lang['changer_langue']}</h2>
+			
+			<p:growl id="growl" />
+				<p:selectOneRadio id="customRadio" layout="custom"  value="#{employeMB.employe.language}">
+            <f:selectItem itemLabel="#{lang['englais']}" itemValue="en" />
+            <f:selectItem itemLabel="#{lang['francais']}" itemValue="fr" />
+            
+         
+        </p:selectOneRadio>
+ 
+        <h:panelGrid columns="3" >
+            <p:radioButton id="opt1" for="customRadio" itemIndex="0" />
+            <h:outputLabel for="opt1" value="#{lang['englais']}" />
+           <p:graphicImage  value="/resources/icons/lang-en.png"  style="margin-top:-6px;width:64px;height:64px;"/>
+          
+ 
+            <p:radioButton id="opt2" for="customRadio" itemIndex="1" />
+            <h:outputLabel for="opt2" value="#{lang['francais']}" />
+             <p:graphicImage  value="/resources/icons/lang-fr.png"  style="margin-top:-6px;width:64px;height:64px;"/>
+        
+           
+    
+    
+        </h:panelGrid>
+       <p:commandButton value="#{lang['enregistrer_modification']}"  actionListener="#{employeMB.changeLanguage}" onsuccess="location.reload();"  />
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+  
+
+
+
+
+
+
+
+</html>

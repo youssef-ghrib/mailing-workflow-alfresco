@@ -1,0 +1,578 @@
+package com.pfe.controllers;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ManagedProperty;
+import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
+import javax.faces.validator.ValidatorException;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+
+
+
+
+import org.primefaces.json.JSONException;
+
+import com.pfe.DAO.EmployeDAO;
+import com.pfe.DAO.FichierDAO;
+import com.pfe.DAO.Language;
+import com.pfe.DAO.OpenCMIS;
+import com.pfe.DAO.ParametreDAO;
+import com.pfe.DAO.RestApi;
+import com.pfe.DAO.ServiceInterneDAO;
+import com.pfe.entities.Employe;
+import com.pfe.entities.Parametre;
+import com.pfe.entities.ServiceInterne;
+
+
+
+@ManagedBean(name = "employeMB")
+@ViewScoped
+public class EmployeMB {
+
+	@ManagedProperty(value = "#{connexion}")
+	private Connexion cnx;
+	private Integer progress = new Integer(0);
+	private String oldPassword;
+	private String newPassword;
+	private String again;
+	private String notificationEmail;
+	private String emailPassword;
+	private String alfrescoServer;
+	private String alfrescoPort;
+	private Employe employe = new Employe();
+	private RestApi restApi;
+	private OpenCMIS openCMIS ;
+	private List<Employe> employes = new ArrayList<Employe>();
+	private List<Employe> filteredEmployes = new ArrayList<Employe>();
+	private List<ServiceInterne> servicesInternes = new ArrayList<ServiceInterne>();
+	private Employe emp;
+	private ServiceInterneDAO serviceInterneDAO = new ServiceInterneDAO();
+	private EmployeDAO employeDAO = new EmployeDAO();
+	private ParametreDAO parametreDAO = new ParametreDAO();
+
+	public void initAlfresco(){
+		 System.out.println("alfresco");
+			restApi = new RestApi(cnx.getAlfrescoServer(),cnx.getAlfrescoPort());
+			 openCMIS = new OpenCMIS(cnx.getEmploye(),cnx.getAlfrescoServer(),cnx.getAlfrescoPort());
+		}
+	
+	// Initialiser le "SelectOneMenu" avec la liste des services internes
+	public void initSelectOneMenu() {
+		servicesInternes = serviceInterneDAO.lister();
+	}
+	
+	public void initEmploye(){
+		
+		Employe loggedUser =cnx.getEmploye();
+		employe.setId(loggedUser.getId());
+		employe.setLanguage(loggedUser.getLanguage());
+		employe.setEmail(loggedUser.getEmail());
+		employe.setPassword(loggedUser.getPassword());
+		employe.setNom(loggedUser.getNom());
+		employe.setServiceInt(loggedUser.getServiceInt());
+		employe.setPrenom(loggedUser.getPrenom());
+		employe.setUsername(loggedUser.getUsername());
+		employe.setFirstLogin(false);
+		employe.setRole(loggedUser.getRole());
+	}
+
+	public void initUser() {
+		Employe loggedUser = cnx.getEmploye();
+
+		employe.setId(loggedUser.getId());
+		employe.setPassword(loggedUser.getPassword());
+		employe.setUsername(loggedUser.getUsername());
+		// employe.setUser_picture(loggedUser.getUser_picture());
+		employe.setNom(loggedUser.getNom());
+		employe.setPrenom(loggedUser.getPrenom());
+
+		employe.setEmail(loggedUser.getEmail());
+
+	}
+
+	// Récupérer l'id de l'employé à modifier et initialiser le formulaire avec
+	// ses informations
+	public void initForm() throws IOException {
+		servicesInternes = serviceInterneDAO.lister();
+		int id;
+		try {
+			id = Integer.parseInt(FacesContext.getCurrentInstance()
+					.getExternalContext().getRequestParameterMap()
+					.get("id"));
+
+		} catch (java.lang.NumberFormatException ex) {
+			// erreur form_id
+			id = 0;
+			FacesContext.getCurrentInstance().getExternalContext()
+					.dispatch("/faces/presets/failEmploye.xhtml");
+
+		}
+		employe = employeDAO.consulter(id);
+	
+		if (employe == null) {
+			
+
+			FacesContext.getCurrentInstance().getExternalContext()
+					.dispatch("/faces/presets/failEmploye.xhtml");
+
+		} 
+		else{
+			emp=new Employe();
+			emp.setId(employe.getId());
+			emp.setPassword(employe.getPassword());
+		   emp.setUsername(employe.getUsername());
+		   emp.setServiceInt(employe.getServiceInt());
+		   emp.setRole(employe.getRole());
+		}
+		
+		
+	   
+	}
+
+	
+
+	
+	public void changeLanguage() {
+		Employe loggedUser = cnx.getEmploye();
+	
+	
+		loggedUser.setLanguage(employe.getLanguage());
+		employeDAO.modifier(employe);
+		cnx.setLocale(new Locale(loggedUser.getLanguage()));
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage("test", new FacesMessage(FacesMessage.SEVERITY_INFO,
+				Language.message("success_language_change"), null));
+		
+	}
+
+	// Initialiser le "DataTable" avec la liste des employés
+	public void initDataTable() {
+		employes = employeDAO.lister();
+	}
+
+	// Retourner la liste des employés recherchés par l'utilisateur
+	public List<Employe> completeEmploye(String query) {
+		List<Employe> employes = employeDAO.lister();
+		List<Employe> filteredEmployes = new ArrayList<Employe>();
+
+		for (int i = 0; i < employes.size(); i++) {
+			Employe employe = employes.get(i);
+			if (employe.getNom().toLowerCase().startsWith(query)) {
+				filteredEmployes.add(employe);
+			}
+		}
+		return filteredEmployes;
+	}
+	
+	public void validateUsername(FacesContext ctx, UIComponent component,
+			Object value) throws ValidatorException {
+		
+		String username = value.toString();
+	
+		boolean result = employeDAO.findUserName(username);
+	if(emp == null){
+		if (result == true ) {
+			FacesMessage msg = 
+					new FacesMessage("erreur", 
+						"nom d'utilisateur deja existe");
+				msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+				
+				
+				throw new ValidatorException(msg);
+		}
+	}
+	else{
+	
+		if (result == true && !username.equals(emp.getUsername())) {
+			FacesMessage msg = 
+					new FacesMessage("erreur", 
+						"nom d'utilisateur deja existe");
+				msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+				
+				
+				throw new ValidatorException(msg);
+		}
+	}
+		
+		
+	}
+	
+	public void validateName(FacesContext ctx, UIComponent component,
+			Object value) throws ValidatorException {
+		
+		String name = value.toString();
+		if (!name.matches("[a-zA-z]+([ '-][a-zA-Z]+)*")) {
+			FacesMessage msg = 
+					new FacesMessage("erreur", 
+							"Entrer un nom valide");
+				msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+				
+				
+				throw new ValidatorException(msg);
+		}
+		
+	}
+	
+	
+	public void validateEmail(FacesContext ctx, UIComponent component,
+			Object value) throws ValidatorException {
+		
+	   String EMAIL_PATTERN = "^[_A-Za-z0-9-]+(\\." +
+					"[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9]+)*" +
+					"(\\.[A-Za-z]{2,})$";
+		 
+		Pattern pattern;
+		 Matcher matcher;
+		 
+		
+				  pattern = Pattern.compile(EMAIL_PATTERN);
+		matcher = pattern.matcher(value.toString());
+		if(!matcher.matches()){
+			
+			FacesMessage msg = 
+				new FacesMessage("Erreur", 
+						"Adresse email n'est pas valide");
+			msg.setSeverity(FacesMessage.SEVERITY_ERROR);
+			
+			
+			throw new ValidatorException(msg);
+
+		}
+		
+	
+	}
+	
+
+	public void verifyPassword(FacesContext ctx, UIComponent component,
+			Object value) {
+
+		
+		
+		if (!cnx.getEmploye().getPassword().equals(value.toString())) {
+			FacesMessage message = new FacesMessage(
+					FacesMessage.SEVERITY_ERROR, "Error!",
+					"mot de passe incorect");
+			FacesContext context = FacesContext.getCurrentInstance();
+			context.addMessage(component.getClientId(context), message);
+			
+			throw new ValidatorException(message);
+		}
+	}
+
+	// Ajouter un employé
+	public String add() throws JSONException, org.json.JSONException,
+			InterruptedException {
+
+		Thread thread = new Thread(){
+			public void run(){
+				sendEmail(employe.getEmail(), "Nouveau compte",
+						"Votre compte a été créé. Votre nom d'utilisateur est "
+								+ employe.getUsername() + " et votre mot de passe est "
+								+ employe.getPassword());
+		}
+	};
+	thread.start();
+		employe.setFirstLogin(true);
+		employeDAO.ajouter(employe);
+		progress = progress + 25;
+		
+	
+
+		restApi.addAlfrescoUser(employe);
+		progress = progress + 25;
+
+		openCMIS.createUserFolder(employe);
+
+		progress = progress + 25;
+		
+
+		// Starting Thread t1
+
+	
+	return "/restreint/Employe/listerEmployes.xhtml?faces-redirect=true";
+	}
+	// Modifier un employé
+	public String edit() throws org.json.JSONException {
+		
+		if(emp==null){
+			
+		}
+		if(employe.getServiceInt()==null){
+			
+		}
+		if(emp.getServiceInt()!=employe.getServiceInt()){
+			
+			if(openCMIS==null){
+				
+			}
+			openCMIS.moveUserToService(emp, employe.getServiceInt());
+		}
+		if(!emp.getRole().equals(employe.getRole())){
+			if(employe.getRole().equals("ABO")){
+				openCMIS.createCourriersNonEnvoye(employe);
+			}
+		}
+		if(!emp.getPassword().equals(employe.getPassword())){
+			restApi.changePassword(employe, employe.getPassword());
+		}
+		employeDAO.modifier(employe);
+		
+		return "listerEmployes.xhtml?faces-redirect=true";
+		
+	}
+
+	// Supprimer un employé
+	public void delete(ActionEvent event) throws IOException {
+		employe = (Employe) event.getComponent().getAttributes()
+				.get("selectedItem");
+	
+		openCMIS.removeUserFolder(employe);
+		restApi.deleteUser(employe);
+		employes.remove(employe);
+		employeDAO.supprimer(employe);
+		
+	}
+
+	// Rechercher des employés
+	public void search(ActionEvent actionEvent) {
+		if (employe == null)
+			employes = employeDAO.lister();
+		else
+			employes = employeDAO.select(employe.getNom());
+	}
+
+	public String changer() throws org.json.JSONException {
+		restApi = new RestApi(cnx.getAlfrescoServer(),cnx.getAlfrescoPort());
+			cnx.getEmploye().setPassword(newPassword);
+			cnx.getEmploye().setFirstLogin(false);
+			employeDAO.modifier(cnx.getEmploye());
+			restApi.changePassword(cnx.getEmploye(), cnx.getEmploye().getPassword());
+			
+			
+			return "/restreint/CourrierArrive/boiteReception?faces-redirect=true";
+		
+			
+	}
+
+	private void sendEmail(String to, String subject, String body) {
+		final String username = "no_reply.oratech";
+		final String password = "mypworatech";
+
+		Properties props = new Properties();
+		props.put("mail.smtp.auth", "true");
+		props.put("mail.smtp.starttls.enable", "true");
+		props.put("mail.smtp.host", "smtp.mail.yahoo.com");
+		props.put("mail.smtp.port", "587");
+
+		Session session = Session.getInstance(props,
+				new javax.mail.Authenticator() {
+					protected PasswordAuthentication getPasswordAuthentication() {
+						return new PasswordAuthentication(username, password);
+					}
+				});
+
+		try {
+			Message message = new MimeMessage(session);
+			message.setFrom(new InternetAddress("no_reply.oratech@yahoo.com"));
+
+			message.setRecipients(Message.RecipientType.TO,
+					InternetAddress.parse(to));
+
+			message.setSubject(subject);
+			message.setText(body);
+
+			Transport.send(message);
+
+		} catch (MessagingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public void saveChanges(){
+		employeDAO.modifier(employe);
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.addMessage("test", new FacesMessage(FacesMessage.SEVERITY_INFO,
+				Language.message("success_employe_change"), null));
+		
+	}
+	public void initParametre() {
+		HashMap<String, String> map = parametreDAO.getParametres();
+		alfrescoServer = map.get("alfrescoServer");
+		alfrescoPort = map.get("alfrescoPort");
+		notificationEmail = map.get("email");
+		emailPassword = map.get("password");
+	}
+
+	public void changeParameters() {
+		Parametre parametre1 = new Parametre();
+		parametre1.setNom("alfrescoServer");
+		parametre1.setValeur(alfrescoServer);
+		Parametre parametre2 = new Parametre();
+		parametre2.setNom("alfrescoPort");
+		parametre2.setValeur(alfrescoPort);
+		Parametre parametre3 = new Parametre();
+		parametre3.setNom("email");
+		parametre3.setValeur(notificationEmail);
+		Parametre parametre4 = new Parametre();
+		parametre4.setNom("password");
+		parametre4.setValeur(emailPassword);
+
+		parametreDAO.modifier(parametre1);
+		parametreDAO.modifier(parametre2);
+		parametreDAO.modifier(parametre3);
+		parametreDAO.modifier(parametre4);
+
+	}
+
+	public void changePassword() throws org.json.JSONException {
+
+		cnx.getEmploye().setPassword(employe.getPassword());
+		employeDAO.modifier(cnx.getEmploye());
+restApi.changePassword(cnx.getEmploye(), employe.getPassword());
+FacesContext context = FacesContext.getCurrentInstance();
+context.addMessage("test", new FacesMessage(FacesMessage.SEVERITY_INFO,
+		Language.message("success_password_change"), null));
+
+
+	
+	}
+
+	public void onComplete() {
+		FacesContext.getCurrentInstance().addMessage(null,
+				new FacesMessage("Progress Completed"));
+	}
+
+	public Integer getProgress() {
+
+		return progress;
+	}
+
+	public String getNotificationEmail() {
+		return notificationEmail;
+	}
+
+	public void setNotificationEmail(String notificationEmail) {
+		this.notificationEmail = notificationEmail;
+	}
+
+	public String getEmailPassword() {
+		return emailPassword;
+	}
+
+	public void setEmailPassword(String emailPassword) {
+		this.emailPassword = emailPassword;
+	}
+
+	public String getAlfrescoServer() {
+		return alfrescoServer;
+	}
+
+	public void setAlfrescoServer(String alfrescoServer) {
+		this.alfrescoServer = alfrescoServer;
+	}
+
+	public String getAlfrescoPort() {
+		return alfrescoPort;
+	}
+
+	public void setAlfrescoPort(String alfrescoPort) {
+		this.alfrescoPort = alfrescoPort;
+	}
+
+	public void setProgress(Integer progress) {
+		this.progress = progress;
+	}
+
+	public Connexion getCnx() {
+		return cnx;
+	}
+
+	public void setCnx(Connexion cnx) {
+		this.cnx = cnx;
+	}
+
+	public String getOldPassword() {
+		return oldPassword;
+	}
+
+	public void setOldPassword(String oldPassword) {
+		this.oldPassword = oldPassword;
+	}
+
+	public String getNewPassword() {
+		return newPassword;
+	}
+
+	public void setNewPassword(String newPassword) {
+		this.newPassword = newPassword;
+	}
+
+	public String getAgain() {
+		return again;
+	}
+
+	public void setAgain(String again) {
+		this.again = again;
+	}
+
+	public Employe getEmploye() {
+		return employe;
+	}
+
+	public void setEmploye(Employe employe) {
+		this.employe = employe;
+	}
+
+	public List<Employe> getEmployes() {
+		return employes;
+	}
+
+	public void setEmployes(List<Employe> employes) {
+		this.employes = employes;
+	}
+
+	public List<Employe> getFilteredEmployes() {
+		return filteredEmployes;
+	}
+
+	public void setFilteredEmployes(List<Employe> filteredEmployes) {
+		this.filteredEmployes = filteredEmployes;
+	}
+
+	public List<ServiceInterne> getServicesInternes() {
+		return servicesInternes;
+	}
+
+	public void setServicesInternes(List<ServiceInterne> servicesInternes) {
+		this.servicesInternes = servicesInternes;
+	}
+
+	private String resultat;
+
+	public String getResultat() {
+		return resultat;
+	}
+
+	public void setResultat(String resultat) {
+		this.resultat = resultat;
+	}
+}

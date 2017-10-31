@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:metadata>
+	<f:viewAction action="#{courrierDepartMB.initEtablissements}" />
+	<f:viewAction action="#{courrierDepartMB.initAlfresco}" />
+</f:metadata>
+
+<h:head>
+	<script type="text/javascript">
+		PrimeFaces.locales['fr'] = {
+			closeText : 'Fermer',
+			prevText : 'Précédent',
+			nextText : 'Suivant',
+			monthNames : [ 'Janvier', 'Février', 'Mars', 'Avril', 'Mai',
+					'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre',
+					'Novembre', 'Décembre' ],
+			monthNamesShort : [ 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+					'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc' ],
+			dayNames : [ 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi',
+					'Vendredi', 'Samedi' ],
+			dayNamesShort : [ 'Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam' ],
+			dayNamesMin : [ 'D', 'L', 'M', 'M', 'J', 'V', 'S' ],
+			weekHeader : 'Semaine',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : '',
+			timeOnlyTitle : 'Choisir l\'heure',
+			timeText : 'Heure',
+			hourText : 'Heures',
+			minuteText : 'Minutes',
+			secondText : 'Secondes',
+			currentText : 'Maintenant',
+			ampm : false,
+			month : 'Mois',
+			week : 'Semaine',
+			day : 'Jour',
+			allDayText : 'Toute la journée'
+		};
+	</script>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">	<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" resizable="true" size="100"
+			minSize="40" maxSize="200">
+			<ui:include src="/presets/header.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west">
+			<ui:include src="/presets/menu.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+			<h:form enctype="multipart/form-data">
+			
+					<h2> #{lang['courrier_depart']}</h2>
+				<p:tabView>
+					<p:tab title="#{lang['information_general']}">
+						<h:panelGrid columns="4" cellpadding="10">
+	
+							<h:outputLabel for="objet" value="#{lang['objet']}:" />
+							<p:inputTextarea id="objet"
+								value="#{courrierDepartMB.courrierDepart.objet}" />
+							
+							<p:outputLabel for="priorite" value="#{lang['priorite']}:" />
+							<p:selectOneMenu id="priorite"
+								value="#{courrierDepartMB.courrierDepart.priorite}">
+								<f:selectItem itemLabel="#{lang['priorite_haute']}"  itemValue="haute" />
+								<f:selectItem itemLabel="#{lang['priorite_normal']}"  itemValue="normal" />
+								<f:selectItem itemLabel="#{lang['priorite_basse']}"  itemValue="basse" />
+							</p:selectOneMenu>
+							
+							<h:outputLabel for="tags" value="#{lang['tags']} :" />
+							<p:inputTextarea id="tags"
+								value="#{courrierDepartMB.courrierDepart.tags}" />
+						</h:panelGrid>
+					</p:tab>
+					<p:tab title="#{lang['destination_courrier']} ">
+						<h:panelGrid columns="2" cellpadding="10">
+							<h:outputLabel for="etablissement" value="#{lang['etablissement']} :" />
+							<p:selectOneMenu id="etablissement"
+								value="#{courrierDepartMB.courrierDepart.etablissementDest}"
+								converter="etablissementConverter" style="width:226px">
+								<p:ajax listener="#{courrierDepartMB.onEtablissementChange()}"
+									update="serviceExterne" />
+									<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_etablissement']} "></f:selectItem>
+								<f:selectItems value="#{courrierDepartMB.etablissements}"
+									var="etablissement" itemLabel="#{etablissement.nom}"
+									itemValue="#{etablissement}" />
+							</p:selectOneMenu>
+							<h:outputLabel for="serviceExterne" value="#{lang['service']}:" />
+							<p:selectOneMenu id="serviceExterne"
+								value="#{courrierDepartMB.courrierDepart.serviceExtDest}"
+								converter="serviceExterneConverter" style="width:226px">
+								
+								<p:ajax listener="#{courrierDepartMB.onServiceExterneChange()}"
+									update="personne" />
+									<f:selectItem  itemValue="" itemLabel="#{lang['service_externe']} "></f:selectItem>
+								<f:selectItems value="#{courrierDepartMB.servicesExternes}"
+									var="service" itemLabel="#{service.nom}" itemValue="#{service}" />
+							</p:selectOneMenu>
+							<h:outputLabel for="personne" value="#{lang['personne']} " />
+							<p:selectOneMenu id="personne"
+								value="#{courrierDepartMB.courrierDepart.personneExtDest}"
+								converter="personneExterneConverter" style="width:226px">
+								<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_personne']}"></f:selectItem>
+								<f:selectItems value="#{courrierDepartMB.personnesExternes}"
+									var="personne" itemLabel="#{personne.nom}"
+									itemValue="#{personne}" />
+							</p:selectOneMenu>
+						</h:panelGrid>
+					</p:tab>
+					
+					<p:tab title="#{lang['fichier']} ">
+						<h:panelGrid columns="2" cellpadding="10">
+						<p:fileUpload fileUploadListener="#{courrierDepartMB.upload}" mode="advanced" label="#{lang['choisir']}"  uploadLabel="#{lang['uploader']}" cancelLabel="#{lang['annuler']}" dragDropSupport="false"
+           />
+						</h:panelGrid>
+					</p:tab>
+				</p:tabView>
+				<p:commandButton value="#{lang['ajouter']}"
+					actionListener="#{courrierDepartMB.add}" />
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

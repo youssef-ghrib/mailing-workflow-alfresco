@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core">
+<h:head>
+<f:view locale="#{connexion.locale}"/>
+	<h:outputStylesheet>
+.ui-icon-menu{
+    background-image: url("#{resource['icons/menu.png']}") !important;
+             height:32px!important;
+    width:32px!important;
+   
+ margin-top: -15px!important;
+   margin-bottom: 50px!important;
+    
+        margin-right: -8px!important;
+    
+}
+</h:outputStylesheet>
+	<h:outputStylesheet>
+
+.ui-menubutton .ui-button-text{
+ margin-right: -20 px!important;
+}
+.ui-menubutton .ui-icon{
+  background: url("#{resource['images/default.jpg']}") !important;
+ 
+         height:32px!important;
+    width:32px!important;
+     margin-left: -5px!important;
+   margin-top: -16px!important;
+   margin-bottom: 50px!important;
+    border-width: 0.1px;
+    border-style: solid ;
+    border-radius :0; 
+    
+   
+ 
+    }
+       .menuIcon {
+           height:32px!important;
+    width:32px!important;
+    background: url("../images/icons/menu.png")!important;
+ margin-top: -15px!important;
+   margin-bottom: 50px!important;
+    
+        margin-right: -8px!important;
+  
+</h:outputStylesheet>
+<link href="#{resource['css/style.css']}" rel="stylesheet" type="text/css"/> 
+</h:head>
+
+
+
+<h:form>
+<img src="#{resource['icons/logo.png']}" height="50" width="50"
+					style="margin-left: 50px;" />
+	<p:toolbar>
+	<f:facet name="left">
+					#{lang['gec']}
+					</f:facet>
+		<f:facet name="right">
+			<p:menuButton value="#{connexion.employe.username} (#{connexion.employe.serviceInt.nom})">
+			
+<p:menuitem value="#{lang['parametre_compte']}" icon="ui-icon-extlink"  outcome="/restreint/gererCompte/manageAccount"/>
+<p:menuitem value="#{lang['parametre_system']}" icon="ui-icon-extlink"  outcome="/restreint/parametreSystem/parametre" rendered="#{connexion.employe.role=='ADMIN'}"/>
+				<p:separator />
+				
+					<p:menuitem value="#{lang['deconnexion']}" action="#{connexion.logout}"
+					icon="ui-icon-disk" />
+			</p:menuButton>
+		</f:facet>
+	</p:toolbar>
+	
+		
+</h:form>
+
+
+</html>

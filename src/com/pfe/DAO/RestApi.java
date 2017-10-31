@@ -1,0 +1,204 @@
+package com.pfe.DAO;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CookieStore;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.BasicClientCookie;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
+import com.google.gson.Gson;
+import com.pfe.entities.CourrierArrive;
+import com.pfe.entities.Employe;
+import com.pfe.entities.Fichier;
+
+
+
+@SuppressWarnings( "deprecation" )
+public class RestApi {
+	 private static final String PASSWORD_URL   = "/alfresco/service/api/person/changepassword/";
+    private static final String USER_URL       = "/alfresco/service/api/people";
+
+    private static final String MEMBERSHIP_URL = "/alfresco/service/api/sites/gce/memberships";
+
+   private static final String LOGIN_URL = "/alfresco/service/api/login";
+	private static final String NODE_URL = "/alfresco/service/api/node/";
+	 
+	private String url;
+public RestApi(String serverAdress,String serverPort){
+	
+		url="http://"+serverAdress+":"+serverPort;
+	}
+	
+	
+	public void addTag(Fichier fichier,String tags) throws JSONException{
+		
+		 String[] tagTable = tags.split( " " );
+		 String json="[";
+         for ( String tag : tagTable ) {
+
+             json=json+"\""+tag+"\",";
+             }
+String finalJson=json+"]";
+
+
+restFulCall(finalJson,url+NODE_URL+fichier.getChemin()+"/tags");
+	}
+    
+	public String getTicket() throws JSONException, UnsupportedOperationException, IOException{
+		String json="{\"username\" : \"admin\",\"password\" : \"admin\"}";
+
+	
+BufferedReader br=restFulCall(json, url+LOGIN_URL);
+StringBuilder builder = new StringBuilder();
+for (String line = null; (line =br.readLine()) != null;) {
+    builder.append(line).append("\n");
+}
+
+JSONObject jsonObject =  new JSONObject(builder.toString());
+JSONObject ticket =(JSONObject) jsonObject.get("data");
+
+return(ticket.get("ticket").toString());	
+
+	}
+	
+	public void addComment(Fichier fichier,String commentaires) throws JSONException, IOException{
+
+		String json="{  \"content\":\""+commentaires+"\"}";
+		
+		String url=this.url+NODE_URL+fichier.getChemin()+"/comments";
+
+
+restFulCall(json, url);
+	}
+    public void addAlfrescoUser( Employe emp ) throws JSONException, InterruptedException {
+    	Thread.sleep(1000);
+        AlfrescoUser user = new AlfrescoUser();
+        user.setUrl( "\\/alfresco\\/service\\/api\\/people\\/" + emp.getUsername() );
+        user.setUserName( emp.getUsername() );
+        user.setPassword( emp.getPassword() );
+        user.setFirstName( emp.getNom() );
+        user.setLastName( emp.getPrenom() );
+        user.setEmail( emp.getEmail() );
+        Gson gson = new Gson();
+        String json = gson.toJson( user );
+        restFulCall( json, url+USER_URL );
+        addMembership( emp );
+
+    }
+
+    public void deleteUser( Employe emp ) throws IOException {
+
+        try {
+
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+
+            httpClient.getCredentialsProvider().setCredentials(
+                    AuthScope.ANY,
+                    new UsernamePasswordCredentials( "admin", "admin" ) );
+
+            HttpDelete deleteRequest = new HttpDelete(
+            		url+USER_URL + emp.getUsername() );
+
+            HttpResponse response = httpClient.execute( deleteRequest );
+
+            httpClient.getConnectionManager().shutdown();
+
+        } catch ( MalformedURLException es ) {
+
+            es.printStackTrace();
+
+        } catch ( IOException e ) {
+
+            e.printStackTrace();
+        }
+    }
+
+    public void changePassword( Employe emp, String password ) throws JSONException {
+        String json = "{\"userName\": \"" + emp.getUsername() + "\",\"oldpw\": \"" + emp.getPassword()
+                + "\",\"newpw\": \"" + password + "\",}";
+        String url = this.url+PASSWORD_URL + emp.getUsername();
+        restFulCall( json, url );
+    }
+
+    public void addMembership( Employe emp ) throws JSONException {
+        String json = "{\"person\":{\"userName\":\"" + emp.getUsername() + "\"},\"role\":\"SiteContributor\"}";
+        restFulCall( json, url+MEMBERSHIP_URL );
+    }
+
+   
+
+    public BufferedReader restFulCall(String json ,String alfrescoUrl) throws JSONException{
+		 String string = json;
+		 
+		 HttpResponse response = null;
+		 BufferedReader br=null;
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+		 try {
+			  
+			
+				
+				httpClient.getCredentialsProvider().setCredentials(
+						AuthScope.ANY,
+	         
+						
+						new UsernamePasswordCredentials("admin", "admin"));
+			
+				
+				HttpPost postRequest = new HttpPost(
+						alfrescoUrl);
+		
+				StringEntity input = new StringEntity(json);
+				input.setContentType("application/json");
+				postRequest.setEntity(input);
+		 
+				 response = httpClient.execute(postRequest);
+				
+				
+				  br = new BufferedReader(
+			                new InputStreamReader((response.getEntity().getContent())));
+			
+				
+			  } catch (MalformedURLException es) {
+		 
+				es.printStackTrace();
+		 
+			  } catch (IOException e) {
+		 
+				e.printStackTrace();
+		 
+			  }
+		
+		
+		 
+	 
+	          
+	 return br;
+	 
+
+		
+	}
+
+}

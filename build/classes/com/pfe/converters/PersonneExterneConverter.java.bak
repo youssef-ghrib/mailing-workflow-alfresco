@@ -1,0 +1,39 @@
+package com.pfe.converters;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
+import javax.faces.convert.FacesConverter;
+
+import com.pfe.DAO.PersonneExterneDAO;
+import com.pfe.entities.PersonneExterne;
+
+@FacesConverter( "personneExterneConverter" )
+public class PersonneExterneConverter implements Converter {
+
+    public Object getAsObject( FacesContext fc, UIComponent uic, String value ) {
+        if ( value != null && value.trim().length() > 0 ) {
+            try {
+                PersonneExterneDAO personneExterneDAO = new PersonneExterneDAO();
+                return personneExterneDAO.consulter( Integer.parseInt( value ) );
+            } catch ( Exception e ) {
+            	System.out.println(e.getMessage());
+            	return null;
+            }
+        }
+        else {
+            return null;
+        }
+    }
+
+    public String getAsString( FacesContext fc, UIComponent uic, Object object ) {
+        if (object != null && !object.equals("")) {
+            return String.valueOf( ( (PersonneExterne) object ).getId() );
+        }
+        else {
+            return null;
+        }
+    }
+}

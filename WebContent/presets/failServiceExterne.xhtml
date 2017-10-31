@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://java.sun.com/jsp/jstl/core"
+     xmlns:c="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+  >
+ 
+       
+   
+<h:head></h:head>
+<ui:include src="/presets/header.xhtml"/>
+
+ <p:panel id="basic" header="#{lang['alert_message']}"  style="margin-top:60px ;width:70%; margin-left: auto;margin-right: auto;">
+        <h:panelGrid columns="2" cellpadding="10">
+            <p:graphicImage value="/resources/icons/alert.png"  style="width:135px;height:114px;" />
+            <h:outputText
+                value="#{lang['fail_service_externe']}"  style="font-size:20px;"/>
+         <p:spacer width="20"/>   <p:link value="#{lang['back_to_lister_service_externe']}" outcome="/restreint/ServiceExterne/listerServicesExternes" />
+        </h:panelGrid>
+    </p:panel>
+
+
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:metadata>
+	<f:viewAction action="#{serviceExterneMB.initDataTable}" />
+</f:metadata>
+
+<h:head>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">	<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" size="100">
+			<ui:include src="/presets/header.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west" size="210">
+		
+			<h:form>
+		
+				<ui:include src="/presets/menu.xhtml" />
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+<ui:include src="/restreint/notification.xhtml" />
+			<h2>#{lang['lister_service_externe']}</h2>
+			<h:form>
+				<p:dataTable id="table" var="serviceExterne"
+					value="#{serviceExterneMB.servicesExternes}" emptyMessage="#{lang['aucun_service_externe']}">
+
+					<p:column headerText="Id" style="text-align: center;width:20px;" >
+						<h:outputText value="#{serviceExterne.id}" />
+					</p:column>
+
+					<p:column headerText="#{lang['nom']}" style="text-align: center" filterBy="#{serviceExterne.nom}" filterMatchMode="contains">
+						<h:outputText value="#{serviceExterne.nom}" />
+					</p:column>
+
+					<p:column headerText="#{lang['etablissement']}"  style="text-align: center"  filterBy="#{serviceExterne.etablissement.nom}" filterMatchMode="contains">
+						<h:outputText value="#{serviceExterne.etablissement.nom}" />
+					</p:column>
+
+					<p:column headerText="#{lang['actions']}" style="text-align: center">
+						<p:button outcome="modifierServiceExterne" icon="ui-icon-pencil">
+							<f:param name="id" value="#{serviceExterne.id}" />
+						</p:button>
+						<p:commandButton icon="ui-icon-trash"
+							actionListener="#{serviceExterneMB.delete}" update="table">
+							<f:attribute name="selectedItem" value="#{serviceExterne}" />
+							<p:confirm header="#{lang['confirmation']}"
+								message="#{lang['supprimer_service']}"
+								icon="ui-icon-alert" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+				<p:confirmDialog global="true">
+					<p:commandButton value="#{lang['oui']}" type="button"
+						styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+					<p:commandButton value="#{lang['non']}" type="button"
+						styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+				</p:confirmDialog>
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

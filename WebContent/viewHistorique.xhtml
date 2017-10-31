@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:c="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:metadata>
+
+</f:metadata>
+
+<h:head>
+</h:head>
+
+<h:body>
+
+
+	
+			<h:form >
+		
+							<h:outputText value="Historique du courrier :" />
+							<p:panelGrid columns="2">
+								<h:outputText value="Reference" />
+								<h:outputText value="#{historiqueMB.courrierArrive.ref}" />
+								<h:outputText value="Objet" />
+								<h:outputText value="#{historiqueMB.courrierArrive.objet}" />
+								<h:outputText value="Document attache" />
+								<h:outputText value="facture" />
+								<h:outputText value="Date de soumission" />
+								<h:outputText
+									value="#{historiqueMB.courrierArrive.dateReception}">
+									<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+								<h:outputText
+									value="	ddd #{HistroriqueMB.historiques.size()}">
+									
+								</h:outputText>
+							
+							</p:panelGrid>
+							
+							<p:dataTable value="#{HistroriqueMB.historiques}" id="tt"
+								var="historique">
+								<p:column headerText="Service">
+									<h:outputText value="#{historique.employe.serviceInt.nom}" />
+								</p:column>
+								<p:column headerText="Employe">
+									<h:outputText value="#{historique.employe.nom}" />
+								</p:column>
+								<p:column headerText="Date de reception">
+									<h:outputText value="#{historique.dateReception}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Commentaires">
+									<h:outputText value="#{historique.commentaires}" />
+								</p:column>
+
+								<p:column headerText="Date fin de traitement">
+									<h:outputText value="#{historique.dateFinTraitement}">
+										<f:convertDateTime pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="Status de courrier">
+									<h:outputText value="#{historique.statut}" />
+								</p:column>
+							</p:dataTable>
+					
+			</h:form>
+
+
+</h:body>
+</html>

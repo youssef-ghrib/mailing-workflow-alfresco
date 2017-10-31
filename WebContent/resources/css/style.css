@@ -1,0 +1,61 @@
+
+
+.fileupload-buttonbar .ui-button input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0;
+  border: solid transparent;
+  border-width: 0 0 100px 200px;
+  opacity: 0;
+  filter: alpha(opacity=0);
+  -o-transform: translate(250px, -50px) scale(1);
+  direction: ltr;
+  cursor: pointer;
+  z-index: 5000;
+    background-image: none !important;
+}
+
+.fileinput-button {
+  overflow: hidden;
+  background-image: none !important;
+}
+.textHeader{
+	color:#0073ea;
+}
+
+.ui-layout-pane {
+	border: 0!important;
+}
+
+.ui-layout-west {
+	float: left;
+	width:300px!important;
+
+}
+
+.ui-layout-north {
+	height: 149px !important;
+}
+
+.south .ui-layout-unit-content {
+	background: #8AC007 !important;
+}
+
+.ui-toolbar {
+	background: #8AC007 !important;
+}
+
+th {
+	background: #eee !important;
+	color: #555555 !important;
+}
+
+.ui-button-text {
+	background: #eee !important;
+	color: #555555 !important;
+}
+
+.ui-panelmenu-header {
+	background: #eee !important;
+}

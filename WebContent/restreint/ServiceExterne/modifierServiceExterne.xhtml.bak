@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	 xmlns:ui="http://java.sun.com/jsf/facelets"    >
+
+<f:metadata>
+	<f:viewAction action="#{serviceExterneMB.initForm}" />
+</f:metadata>
+
+<h:head>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">	<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" resizable="true" size="100"
+			minSize="40" maxSize="200">
+            <ui:include src="/presets/header.xhtml"/>
+    </p:layoutUnit>
+
+		<p:layoutUnit position="west" size="200">
+			<h:form>
+				<ui:include src="/presets/menu.xhtml"/>
+			</h:form>
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+			<h:form>
+			<h2> #{lang['modifier_service_externe']}</h2>
+					<h:panelGrid columns="3" cellpadding="5">
+					<h:outputLabel for="nom" value="#{lang['nom']} :" />
+					<p:inputText id="nom" value="#{serviceExterneMB.serviceExterne.nom}"  validator="#{serviceExterneMB.validateServiceExterne}" required="true" requiredMessage="#{lang['nom_requis']}">
+					<p:ajax  update="nom,msgNom"> </p:ajax>
+					</p:inputText>
+					<p:message id="msgNom" for="nom" />
+					<h:outputLabel for="etablissement" value="#{lang['etablissement']} :" />
+					<p:selectOneMenu id="etablissement"
+						value="#{serviceExterneMB.serviceExterne.etablissement}"
+						converter="etablissementConverter" style="width:226px">
+						<f:selectItems value="#{serviceExterneMB.etablissements}" var="etablissement"
+							itemLabel="#{etablissement.nom}" itemValue="#{etablissement}" />
+					</p:selectOneMenu>
+					<p:message id="msgetablissement" for="etablissement" />
+					<p:commandButton value="#{lang['modifier']}" action="#{serviceExterneMB.edit}"  update="nom,msgNom"/>
+				</h:panelGrid>
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

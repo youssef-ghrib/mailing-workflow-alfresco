@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html 
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+   xmlns:f="http://xmlns.jcp.org/jsf/core"
+     xmlns:c="http://java.sun.com/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+     
+     xmlns:ui="http://java.sun.com/jsf/facelets"
+  >
+  <c:metadata>
+	<f:viewAction action="#{employeMB.initParametre}" />
+</c:metadata>
+<h:head>
+
+<h:outputStylesheet>
+.formPanel{
+	width:600px ;
+	margin-top: 50px;
+	 margin-left: auto;
+    margin-right: auto;
+	background-color: white;
+	 box-shadow: 0 0 10px rgba(0,0,0,0.3);	
+}
+.ui-layout-resizer, .ui-layout-resizer-north, ui-layout-resizer-open, .ui-layout-resizer-north-open 
+{
+    display: none;
+}
+.reg-headline-container {
+    position: absolute;
+    top: 130px;
+    left: 380px;
+    float: left;
+    z-index: 1;
+ background-color:blue;
+}
+
+</h:outputStylesheet>
+
+
+</h:head>
+
+
+<h:body>
+	<p:layout  fullPage="true" >
+		
+		<p:layoutUnit position="north" height="75" style="border:0px;"  >  
+       
+   <ui:include src="/presets/header.xhtml"/>
+   
+    </p:layoutUnit> 
+
+	
+		
+
+		<p:layoutUnit position="center">
+		
+		<h:panelGrid styleClass="formPanel">
+		<h2>#{lang['parametre_system']}</h2>
+			<h:form>
+			<p:growl id="growl" showDetail="true"  />  
+				<h:panelGrid columns="2" cellpadding="5">
+					<h:outputLabel  for="alfresco" value="#{lang['adresse_ip']}" styleClass="bold" />
+
+               <p:inputText  id="alfresco"  value="#{employeMB.alfrescoServer}" required="true"  requiredMessage="#{lang['champ_requis']}"/>
+               <h:outputLabel  for="alfrescoPort" value=" #{lang['port_serveur']}" styleClass="bold" />
+
+               <p:inputText  id="alfrescoPort"  value="#{employeMB.alfrescoPort}" required="true" requiredMessage="#{lang['champ_requis']}" />
+ 
+
+ <h:outputLabel  for="email" value="#{lang['email_notification']}" styleClass="bold" />
+  <p:inputText  id="email"  value="#{employeMB.notificationEmail}" required="true" requiredMessage="#{lang['champ_requis']}" />
+  <h:outputLabel  for="password" value="#{lang['password']}" styleClass="bold" />
+  <p:inputText  id="password"  value="#{employeMB.emailPassword}" required="true"  requiredMessage="#{lang['champ_requis']}" />
+
+ </h:panelGrid>
+ 
+         
+        
+<p:commandButton value="#{lang['enregistrer_modification']}"  actionListener="#{employeMB.changeParameters}" update="growl"   />
+
+
+				
+			</h:form>
+			</h:panelGrid>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+  
+
+
+
+
+
+
+
+</html>

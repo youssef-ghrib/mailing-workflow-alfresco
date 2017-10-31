@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+
+	>
+
+<h:head>
+
+	<h:outputScript target="body">
+function showDialog(){
+
+
+rc();
+setTimeout(
+  function() 
+  {
+  PF('dlgMessage').show();
+  
+  }, 1000);
+
+  
+  
+  }
+ function showSuccess() {
+
+$( "#form\\:dialog" ).mouseover(function() {
+
+  myStopFunction();
+});
+
+$( "#form\\:dialog" ).mouseout(function() {
+ myFunction();
+});
+}
+               var myVar;
+function myFunction()
+{
+myVar=setTimeout(function(){ PF('dlg1').hide()},3000);
+}
+
+function myStopFunction()
+{
+clearTimeout(myVar);
+
+
+}
+var audio = document.getElementById("audio"); 
+
+function playAudio() { 
+   
+    audio.play(); 
+    
+} 
+            </h:outputScript>
+
+</h:head>
+
+<h:body>
+<h:form   >   
+<p:poll interval="4"  autoStart="true"  listener="#{notificationMB.execute}" />
+</h:form>
+	<h:form  id="formNotification" >
+ <p:remoteCommand name="rc" update=":formNotification:dialogMessage,:formNotification:dialogNotification"  />
+		
+	
+	
+	
+	
+		
+
+
+		
+	
+		
+		<p:dialog   id="dialogNotUnlock" widgetVar="dlgNotUnlock" minHeight="600">
+					<h:panelGrid columns="1">
+					<h:outputLabel for="commentaires" value="#{lang['commentaires']}" />
+					<p:inputTextarea id="commentaires"
+						value="#{notificationMB.commentaires}" />
+					<p:commandButton icon="ui-icon-unlocked"
+						oncomplete="PF('dlgNotUnlock').hide();"
+						actionListener="#{notificationMB.unlock}"
+						 />
+						 </h:panelGrid>
+				</p:dialog>
+				<p:dialog   id="dialogNottraiter" widgetVar="dlgNottraiter" minHeight="600">
+					<h:panelGrid columns="1">
+					<h:outputLabel for="commentairesT" value="#{lang['commentaires']}" />
+					<p:inputTextarea id="commentairesT"
+						value="#{notificationMB.commentaires}" />
+					<p:commandButton icon="ui-icon-check"
+						oncomplete="PF('dlgNottraiter').hide();"
+						actionListener="#{notificationMB.traiter}" />
+						</h:panelGrid>
+				</p:dialog>
+				<p:dialog   id="dialogNotSend" widgetVar="dlgNotSend" minHeight="600">
+				
+					<h:panelGrid id="azerty" columns="2" cellpadding="10">
+						<p:outputLabel for="radio" value="#{lang['type_destinataire']}:" />
+						<p:selectOneRadio id="radio" value="#{notificationMB.radio}" >
+							<p:ajax event="change" update="azerty" />
+							<f:selectItem itemLabel="#{lang['service']}" itemValue="service" />
+							<f:selectItem itemLabel="#{lang['personne']}" itemValue="personne" />
+						</p:selectOneRadio>
+						<h:outputLabel for="serviceInterne" value="#{lang['service']}:" />
+						<p:selectOneMenu id="serviceInterne"
+							value="#{notificationMB.courrierArrive.serviceIntDest}"
+							converter="serviceConverter" style="width:226px">
+							<p:ajax listener="#{notificationMB.onServiceInterneChange()}"
+								update="employe" />
+								<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_service']}"></f:selectItem>
+							<f:selectItems value="#{notificationMB.servicesInternes}"
+								var="service" itemLabel="#{service.nom}" itemValue="#{service}" />
+						</p:selectOneMenu>
+						<h:outputLabel for="employe" value="#{lang['employe']}:"
+							rendered="#{notificationMB.radio=='personne'}" />
+						<p:selectOneMenu id="employe"
+							rendered="#{notificationMB.radio=='personne'}"
+							value="#{notificationMB.courrierArrive.empDest}"
+							converter="employeConverter" style="width:226px">
+							<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_personne']}"></f:selectItem>
+							<f:selectItems value="#{notificationMB.employes}" var="employe"
+								itemLabel="#{employe.nom}  #{employe.prenom} " itemValue="#{employe}" />
+						</p:selectOneMenu>
+					</h:panelGrid>
+					<p:commandButton icon="ui-icon-mail-closed"
+						oncomplete="PF('dlgNotSend').hide();"
+						actionListener="#{notificationMB.send}"
+						 />
+				</p:dialog>
+				
+				<p:dialog   id="dialogNotHistorique"  widgetVar="dlgNotHistorique" header="#{lang['historique_courrier']}"
+							hideEffect="fade" dynamic="true" style="width:100%">
+							<h:panelGrid columns="1" cellpadding="10" width="100%">
+							<h:panelGrid columns="2">
+								<h:outputText value="#{lang['reference']}" />
+								<h:outputText value="#{notificationMB.courrierArrive.ref}" />
+								<h:outputText value="#{lang['objet']}" />
+								<h:outputText value="#{notificationMB.courrierArrive.objet}" />
+							
+								<h:outputText value="#{lang['date_reception']}" />
+								<h:outputText
+									value="#{notificationMB.courrierArrive.dateReception}">
+									<f:convertDateTime   timeZone="GMT+1"  pattern="dd/MM/yyyy HH:mm" />
+								</h:outputText>
+							</h:panelGrid>
+							<p:dataTable value="#{notificationMB.historiques}" id="tt"
+								var="historique">
+								<p:column headerText="#{lang['service']}">
+									<h:outputText value="#{historique.employe.serviceInt.nom}" />
+								</p:column>
+								<p:column headerText="#{lang['employe']}">
+									<h:outputText value="#{historique.employe.nom}" />
+								</p:column>
+								<p:column headerText="#{lang['date_reception']}">
+									<h:outputText value="#{historique.dateReception}">
+										<f:convertDateTime   timeZone="GMT+1"  pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{lang['commentaires']}">
+									<h:outputText value="#{historique.commentaires}" />
+								</p:column>
+
+								<p:column headerText="#{lang['date_fin_traitement']}">
+									<h:outputText value="#{historique.dateFinTraitement}">
+										<f:convertDateTime   timeZone="GMT+1"  pattern="dd/MM/yyyy HH:mm" />
+									</h:outputText>
+								</p:column>
+								<p:column headerText="#{lang['status_courrier']}">
+									<h:outputText value="#{historique.statut}" />
+								</p:column>
+							</p:dataTable>
+							</h:panelGrid>
+						</p:dialog>
+		
+		<p:dialog   id="dialogMessage" widgetVar="dlgMessage"
+			onShow="playAudio();"
+			onHide="myStopFunction();" resizable="true" width="375" 
+			styleClass="ouss">
+
+		
+			
+	<h:panelGrid columns="2">
+				<p:graphicImage value="/resources/images/courrier.png"  style="margin-right:25px;margin-left:10px;margin-top:5px;"/>
+				<h:panelGrid columns="1">
+					<h:outputText
+						value="#{lang['courrier_recu']}  #{notificationMB.getLastUser()} " />
+					<h:outputText value="#{notificationMB.courrierArrive.objet} "  />
+					
+				
+				
+				</h:panelGrid>
+			</h:panelGrid>
+			
+			 
+			 <h:panelGrid columns="3" cellpadding="5">
+			 <p:spacer width="50"  /> 
+			
+			<p:commandButton value="#{lang['ouvrir']}" onclick="PF('dlgNot').show();"/>
+			<p:commandButton value="#{lang['annuler']}"  onclick="PF('dlgMessage').hide();"/>
+			</h:panelGrid>
+		
+		</p:dialog>
+		<audio src="#{resource['audio/message.mp3']}"  id="audio">
+
+
+		</audio>
+		
+		<p:dialog   id="dialogNotification" widgetVar="dlgNot"  minWidth="800"   style="width:800px;" >
+
+					<div class="ui-grid">
+
+						<div class="ui-grid-col-6" >
+						<h:panelGrid columns="1"  width="800">
+							<h:panelGrid columns="2" cellpadding="5" >
+								<h:outputLabel for="ref" value="#{lang['ref']}:" />
+								<h:outputLabel id="ref"
+									value="#{notificationMB.courrierArrive.ref}" />
+								<h:outputLabel for="objet" value="#{lang['objet']}:" />
+								<h:outputLabel id="objet"
+									value="#{notificationMB.courrierArrive.objet}" />
+								<h:outputLabel for="priorite" value="#{lang['priorite']}:" />
+								<h:outputLabel id="priorite"
+									value="#{notificationMB.courrierArrive.priorite}" />
+								<h:outputLabel for="dateReception" value="#{lang['date_reception']}" >
+								<f:convertDateTime   timeZone="GMT+1"  pattern="dd/MM/yyyy" />
+								</h:outputLabel>
+								<h:outputLabel id="dateReception"
+									value="#{notificationMB.courrierArrive.dateReception}" />
+								<h:outputLabel for="tags" value="#{lang['tags']}:" />
+								<h:outputLabel id="tags"
+									value="#{notificationMB.courrierArrive.tags}" />
+									
+							</h:panelGrid>
+							 <h:panelGrid columns="1" cellpadding="5" style="margin-top:60px;">
+										
+										<h:outputLabel value="#{lang['actions']}:" />
+										<h:panelGrid columns="4" cellpadding="2" >
+									<p:commandButton icon="ui-icon-unlocked"  value="#{lang['liberer']}"
+							oncomplete="PF('dlgNotUnlock').show();"
+							>
+						
+						</p:commandButton>
+						<p:commandButton icon="ui-icon-check"  value="#{lang['traiter']}"
+							oncomplete="PF('dlgNottraiter').show();"
+							>
+						
+						</p:commandButton>
+						<p:commandButton icon="ui-icon-mail-closed"  value="#{lang['envoyer']}"
+							oncomplete="PF('dlgNotSend').show();"
+							>
+						
+						</p:commandButton>
+
+						
+						<p:commandButton icon="ui-icon-document" value="#{lang['historiques']}"
+							oncomplete="PF('dlgNotHistorique').show();" 
+							actionListener="#{notificationMB.voirHistorique}"
+							update=":formNotification:dialogNotHistorique" >
+							
+						</p:commandButton>
+									</h:panelGrid>
+								</h:panelGrid>
+	 
+					
+					
+					
+						</h:panelGrid>
+						</div>
+<div class="ui-grid-col-6">
+							<object type="application/pdf"  height="400"  width="100%" data="http://localhost:8080/alfresco/service/api/node/content/#{notificationMB.fichier.chemin}?alf_ticket=#{notificationMB.getTicket()}"   >
+            #{lang['navigateur']},
+             <a href="/resources/demo/media/guide.pdf">click</a> to download pdf instead.
+        </object>
+							
+					</div>
+					</div>
+				</p:dialog>
+		
+	</h:form>
+</h:body>
+</html>

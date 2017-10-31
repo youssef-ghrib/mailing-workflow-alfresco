@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+<f:metadata>
+
+	<f:viewAction action="#{historiqueMB.initAlfresco}" />
+	<f:viewAction action="#{historiqueMB.initCourriersTraites}" />
+</f:metadata>
+<h:head>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">
+		<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" size="100">
+			<ui:include src="/presets/header.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west" size="210">
+
+			<ui:include src="/presets/menu.xhtml" />
+
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+			<h:form id="form">
+				<h2>#{lang['courrier_traites']}</h2>
+				<h:panelGrid rendered="#{historiqueMB.courriersTraites.size()==0}"
+					columns="1" width="100%">
+					<p:separator />
+					
+	<h:panelGrid columns="3">
+						<p:spacer width="150"></p:spacer>
+						<p:graphicImage value="#{resource['icons/courrier.png']}"
+							style="opacity:0.5">
+						</p:graphicImage>
+						<h3
+						style="text-align: center; margin-left: auto; margin-right: auto; color: #999999;">
+						#{lang['courrier_traite']}</h3>
+					</h:panelGrid>
+					<p:separator />
+				</h:panelGrid>
+				<p:dataTable id="table" var="historique"
+					rendered="#{historiqueMB.courriersTraites.size()!=0}"
+					value="#{historiqueMB.courriersTraites}">
+
+					<p:column headerText="#{lang['ref']}" style="text-align: center">
+						<h:outputText value="#{historique.courrierArr.ref}" />
+					</p:column>
+
+					<p:column headerText="#{lang['objet']}" style="text-align: center">
+						<h:outputText value="#{historique.courrierArr.objet}" />
+					</p:column>
+					<p:column headerText="#{lang['commentaires']}" style="text-align: center">
+						<h:outputText value="#{historique.commentaires}" />
+					</p:column>
+					<p:column headerText="#{lang['date_reception']}" style="text-align: center">
+						<h:outputText value="#{historique.dateReception}">
+							<f:convertDateTime   timeZone="GMT+1"   pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="Date fin traitement"
+						style="text-align: center">
+						<h:outputText value="#{historique.dateFinTraitement}">
+							<f:convertDateTime   timeZone="GMT+1"   pattern="dd/MM/yyyy" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="#{lang['actions']}" style="text-align: center">
+						<p:commandButton icon="ui-icon-mail-open" update=":form:dialog4"
+							oncomplete="PF('dlg4').show();"
+							actionListener="#{historiqueMB.getAttribute}">
+							<f:attribute name="selectedItem"
+								value="#{historique.courrierArr}" />
+						</p:commandButton>
+					</p:column>
+				</p:dataTable>
+
+				<p:dialog   id="dialog4" widgetVar="dlg4" minWidth="800"
+					style="width:800px;">
+
+					<div class="ui-grid">
+
+						<div class="ui-grid-col-6">
+							<h:panelGrid columns="1">
+								<h:panelGrid columns="2" cellpadding="5" width="600">
+									<h:outputLabel for="ref" value="#{lang['ref']}:" />
+									<h:outputLabel id="ref"
+										value="#{historiqueMB.courrierArrive.ref}" />
+									<h:outputLabel for="objet" value="#{lang['objet']}:" />
+									<h:outputLabel id="objet"
+										value="#{historiqueMB.courrierArrive.objet}" />
+									<h:outputLabel for="priorite" value="#{lang['priorite']}:" />
+									<h:outputLabel id="priorite"
+										value="#{historiqueMB.courrierArrive.priorite}" />
+									<h:outputLabel for="dateReception" value="#{lang['date_reception']}:" />
+									<h:outputLabel id="dateReception"
+										value="#{historiqueMB.courrierArrive.dateReception}" />
+									<h:outputLabel for="tags" value="#{lang['tags']}:" />
+									<h:outputLabel id="tags"
+										value="#{historiqueMB.courrierArrive.tags}" />
+
+								</h:panelGrid>
+
+								<p:commandButton icon="ui-icon-trash"
+									oncomplete="PF('pnl').show();"
+									actionListener="#{historiqueMB.voirHistorique}"
+									update=":form:historique">
+
+								</p:commandButton>
+
+							</h:panelGrid>
+
+						</div>
+						<div class="ui-grid-col-6">
+							<object type="application/pdf" height="400" width="100%"
+								data="http://localhost:8080/alfresco/service/api/node/content/#{historiqueMB.fichier.chemin}?alf_ticket=#{historiqueMB.getTicket()}">
+								#{lang['navigateur']}, 
+							</object>
+
+						</div>
+					</div>
+				</p:dialog>
+				<p:dialog   id="historique" widgetVar="pnl"
+					header="#{lang['historique_courrier']}" hideEffect="fade" dynamic="true"
+					style="width:100%">
+					<h:panelGrid columns="1" cellpadding="10" width="100%">
+						<h:panelGrid columns="2">
+							<h:outputText value="#{lang['reference']}" />
+							<h:outputText value="#{historiqueMB.courrierArrive.ref}" />
+							<h:outputText value="#{lang['objet']}" />
+							<h:outputText value="#{historiqueMB.courrierArrive.objet}" />
+
+							<h:outputText value="#{lang['date_reception']}" />
+							<h:outputText
+								value="#{historiqueMB.courrierArrive.dateReception}">
+								<f:convertDateTime   timeZone="GMT+1"   pattern="dd/MM/yyyy" />
+							</h:outputText>
+						</h:panelGrid>
+						<p:dataTable value="#{historiqueMB.historiques}" id="tt"
+							var="historique">
+							<p:column headerText="#{lang['service']}">
+								<h:outputText value="#{historique.employe.serviceInt.nom}" />
+							</p:column>
+							<p:column headerText="#{lang['employe']}">
+								<h:outputText value="#{historique.employe.nom}" />
+							</p:column>
+							<p:column headerText="#{lang['date_reception']}">
+								<h:outputText value="#{historique.dateReception}">
+									<f:convertDateTime   timeZone="GMT+1"   pattern="dd/MM/yyyy" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="#{lang['commentaires']}">
+								<h:outputText value="#{historique.commentaires}" />
+							</p:column>
+
+							<p:column headerText="#{lang['date_fin_traitement']}">
+								<h:outputText value="#{historique.dateFinTraitement}">
+									<f:convertDateTime   timeZone="GMT+1"   pattern="dd/MM/yyyy"/>
+								</h:outputText>
+							</p:column>
+							<p:column headerText="#{lang['status_courrier']}">
+								<h:outputText value="#{historique.statut}" />
+							</p:column>
+						</p:dataTable>
+					</h:panelGrid>
+				</p:dialog>
+
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

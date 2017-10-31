@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:metadata>
+	<f:viewAction action="#{courrierArriveMB.initSelectOneMenu}" />
+	<f:viewAction action="#{courrierArriveMB.initAlfresco}" />
+</f:metadata>
+
+<h:head>
+	<script type="text/javascript">
+		PrimeFaces.locales['fr'] = {
+			closeText : 'Fermer',
+			prevText : 'Précédent',
+			nextText : 'Suivant',
+			monthNames : [ 'Janvier', 'Février', 'Mars', 'Avril', 'Mai',
+					'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre',
+					'Novembre', 'Décembre' ],
+			monthNamesShort : [ 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun',
+					'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc' ],
+			dayNames : [ 'Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi',
+					'Vendredi', 'Samedi' ],
+			dayNamesShort : [ 'Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam' ],
+			dayNamesMin : [ 'D', 'L', 'M', 'M', 'J', 'V', 'S' ],
+			weekHeader : 'Semaine',
+			firstDay : 1,
+			isRTL : false,
+			showMonthAfterYear : false,
+			yearSuffix : '',
+			timeOnlyTitle : 'Choisir l\'heure',
+			timeText : 'Heure',
+			hourText : 'Heures',
+			minuteText : 'Minutes',
+			secondText : 'Secondes',
+			currentText : 'Maintenant',
+			ampm : false,
+			month : 'Mois',
+			week : 'Semaine',
+			day : 'Jour',
+			allDayText : 'Toute la journée'
+		};
+	</script>
+</h:head>
+
+<h:body>
+	<p:layout fullPage="true">	<p:layoutUnit position="south" size="30" styleClass="south">
+			<h:outputText style="float:right;font-size:12px;"
+				value="#{lang['oratech']}" />
+		</p:layoutUnit>
+		<p:layoutUnit position="north" resizable="true" size="100"
+			minSize="40" maxSize="200">
+			<ui:include src="/presets/header.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="west">
+			<ui:include src="/presets/menu.xhtml" />
+		</p:layoutUnit>
+
+		<p:layoutUnit position="center">
+<ui:include src="/restreint/notification.xhtml" />
+		
+		
+			<h:form enctype="multipart/form-data" id="form"  >
+			
+		
+					<h2> #{lang['creer_courrier']} </h2>
+				<p:tabView prependId="false" style="height:500px;" >
+					<p:tab  title="#{lang['information_general']}">
+						<h:panelGrid columns="4" cellpadding="15">
+							<h:outputLabel for="ref" value="#{lang['ref']} :" />
+						<h:panelGrid columns="1"  cellpadding="5" >
+							<p:inputText id="ref" required="true"  requiredMessage="#{lang['ref_required']} :"
+								value="#{courrierArriveMB.courrierArrive.refExp}" >
+								<p:ajax update="ref,msgref"/> 
+								</p:inputText>
+							<p:message id="msgref" for="ref" />
+							</h:panelGrid>
+							<h:outputLabel for="objet" value="#{lang['objet']}:"  required="true" requiredMessage="#{lang['objet_required']} "/>
+							<h:panelGrid columns="1"   cellpadding="5" >
+							<p:inputTextarea id="objet" required="true" requiredMessage="#{lang['objet_required']} "
+								value="#{courrierArriveMB.courrierArrive.objet}" >
+								<p:ajax update="objet,msgObjet"/> 
+								</p:inputTextarea>
+								
+								<p:message id="msgObjet" for="objet" />
+							</h:panelGrid>
+							<p:outputLabel  value="#{lang['date_reception']}" />
+							<h:panelGrid columns="1"  cellpadding="5" >
+							<p:calendar id="date" pattern="dd/MM/yyyy" locale="fr" required="true" requiredMessage="#{lang['date_required']}"
+								value="#{courrierArriveMB.courrierArrive.dateReception}" >
+								<p:ajax update="msgDate,date"/> 
+								</p:calendar>
+								<p:message id="msgDate" for="date" />
+							</h:panelGrid>
+							<p:outputLabel for="priorite" value="#{lang['priorite']}:" />
+							<p:selectOneMenu id="priorite"
+								value="#{courrierArriveMB.courrierArrive.priorite}">
+								<f:selectItem itemLabel="#{lang['priorite_haute']}"  itemValue="haute" />
+								<f:selectItem itemLabel="#{lang['priorite_normal']}"  itemValue="normal" />
+								<f:selectItem itemLabel="#{lang['priorite_basse']}"  itemValue="basse" />
+							</p:selectOneMenu>
+							<h:outputLabel for="commentaires" value="#{lang['commentaires']}" />
+							<p:inputTextarea id="commentaires"
+								value="#{courrierArriveMB.historique.commentaires}" />
+							<h:outputLabel for="tags" value="#{lang['tags']} :" />
+							<p:inputTextarea id="tags"
+								value="#{courrierArriveMB.courrierArrive.tags}" />
+						</h:panelGrid>
+					</p:tab>
+					<p:tab title="#{lang['source_courrier']}">
+						<h:panelGrid columns="3" cellpadding="10">
+							<h:outputLabel for="etablissement" value="#{lang['etablissement']} :" />
+						
+							<p:selectOneMenu id="etablissement" required="true" requiredMessage="#{lang['required_etablissement']} "
+								value="#{courrierArriveMB.courrierArrive.etablissementSource}"
+								converter="etablissementConverter" style="width:226px">
+								<p:ajax listener="#{courrierArriveMB.onEtablissementChange()}"
+									update="serviceExterne,etablissement,msgEtablissement" />
+									<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_etablissement']} "></f:selectItem>
+								<f:selectItems value="#{courrierArriveMB.etablissements}"
+									var="etablissement" itemLabel="#{etablissement.nom}"
+									itemValue="#{etablissement}" />
+							</p:selectOneMenu>
+							<p:message id="msgEtablissement" for="etablissement" /> 
+							
+							<h:outputLabel for="serviceExterne" value="#{lang['service']}:" />
+							<p:selectOneMenu id="serviceExterne"  required="true" requiredMessage="#{lang['required_service']} "
+								value="#{courrierArriveMB.courrierArrive.serviceExtSource}"
+								converter="serviceExterneConverter" style="width:226px">
+								
+								<p:ajax listener="#{courrierArriveMB.onServiceExterneChange()}"
+									update="personne,serviceExterne,msgServiceExterne" />
+									<f:selectItem  itemValue="" itemLabel="#{lang['service_externe']} "></f:selectItem>
+								<f:selectItems value="#{courrierArriveMB.servicesExternes}"
+									var="service" itemLabel="#{service.nom}" itemValue="#{service}" />
+							</p:selectOneMenu>
+							<p:message id="msgServiceExterne" for="serviceExterne" /> 
+							<h:outputLabel for="personne" value="#{lang['personne']} " />
+							<p:selectOneMenu id="personne"  required="true" requiredMessage="#{lang['required_personne']} "
+								value="#{courrierArriveMB.courrierArrive.personneExtSource}"
+								converter="personneExterneConverter" style="width:226px">
+								<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_personne']}"></f:selectItem>
+								<f:selectItems value="#{courrierArriveMB.personnesExternes}"
+									var="personne" itemLabel="#{personne.nom}"
+									itemValue="#{personne}" />
+									<p:ajax update="personne,msgPersonne"/> 
+							</p:selectOneMenu>
+							<p:message id="msgPersonne" for="personne" /> 
+						</h:panelGrid>
+					</p:tab>
+					<p:tab title="#{lang['destination_courrier']} ">
+						<h:panelGrid id="azerty" columns="2" cellpadding="10">
+							<p:outputLabel for="radio" value="#{lang['type_destinataire']}:" />
+							<p:selectOneRadio id="radio" value="#{courrierArriveMB.radio}">
+								<p:ajax event="change" update="azerty" />
+								<f:selectItem itemLabel="#{lang['service']}" itemValue="service" />
+								<f:selectItem itemLabel="#{lang['personne']}" itemValue="personne" />
+							</p:selectOneRadio>
+							<h:outputLabel for="serviceInterne" value="#{lang['service']}:" />
+							<p:selectOneMenu id="serviceInterne" 
+								value="#{courrierArriveMB.courrierArrive.serviceIntDest}"
+								converter="serviceConverter" style="width:226px">
+								<p:ajax  listener="#{courrierArriveMB.onServiceInterneChange()}"
+									update="employe" />
+								<f:selectItem  itemValue="" itemLabel="#{lang['selectionner_service']}"></f:selectItem>
+								<f:selectItems value="#{courrierArriveMB.servicesInternes}"
+									var="service" itemLabel="#{service.nom}" itemValue="#{service}" />
+							</p:selectOneMenu>
+							<h:outputLabel for="employe" value="#{lang['employe']}:"
+								rendered="#{courrierArriveMB.radio=='personne'}" />
+							<p:selectOneMenu id="employe"
+								rendered="#{courrierArriveMB.radio=='personne'}"
+								value="#{courrierArriveMB.courrierArrive.empDest}"
+								converter="employeConverter" style="width:226px">
+								<f:selectItems value="#{courrierArriveMB.employes}"
+									var="employe" itemLabel="#{employe.nom} #{employe.prenom} " itemValue="#{employe}" />
+									<p:ajax update="employe"></p:ajax>
+							</p:selectOneMenu>
+						</h:panelGrid>
+					</p:tab>
+					<p:tab title="#{lang['fichier']} " >
+						<h:outputLabel value="#{lang['fichier_message']} " />
+						<h:panelGrid columns="2" cellpadding="10">
+						<p:fileUpload id="fichier" fileUploadListener="#{courrierArriveMB.upload}" label="#{lang['choisir']}"  uploadLabel="#{lang['uploder']}" cancelLabel="#{lang['annuler']}" mode="advanced" dragDropSupport="false"    />
+                        <p:message for="fichier"  id="msgFichier"/>
+						</h:panelGrid>
+					</p:tab>
+				</p:tabView>
+				<p:commandButton value="#{lang['ajouter']}" update="@form" 
+					action="#{courrierArriveMB.add}"  />
+			</h:form>
+		</p:layoutUnit>
+	</p:layout>
+</h:body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsp/jstl/core">
+<h:head>
+</h:head>
+<h:body style="background-color:#BBBBBB;" >
+	<h:form>
+		<p:growl id="growl" sticky="true"  life="3000" />
+		<p:panel id="login" header="#{lang['login']}" style="width:450px;margin-left: auto;margin-right: auto;top:200px;position:relative;">
+			<h:panelGrid columns="2" cellpadding="5">
+				<h:outputLabel for="username" value="#{lang['username']}:" />
+				<p:inputText id="username" value="#{connexion.employe.username}"
+					required="true" label="username" />
+				<h:outputLabel for="password" value="#{lang['password']}:" />
+				<p:password id="password" value="#{connexion.employe.password}"
+					required="true" label="password" />
+	
+			</h:panelGrid>
+			<h:panelGrid columns="1" cellpadding="5">
+			<p:commandButton  value="#{lang['sign_in']}" update="growl"
+					action="#{connexion.login}" />
+    		
+			</h:panelGrid>
+			
+		</p:panel>
+	</h:form>
+</h:body>
+</html>

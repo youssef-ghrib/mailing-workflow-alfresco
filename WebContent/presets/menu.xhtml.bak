@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:f="http://java.sun.com/jsp/jstl/core">
+
+<h:head>
+</h:head>
+
+<h:body>
+	<h:form>
+		<p:poll interval="2" listener="#{connexion.countCourrier}"
+			update="user,abo" />
+			<p:poll interval="2" listener="#{connexion.countCourrierService}"
+			update="user,abo" />
+		<p:panelMenu style="width:500px;" rendered="#{connexion.employe.role=='ADMIN'}">
+			<p:submenu  label="#{lang['service']}">
+				<p:menuitem value="#{lang['lister_service']}"
+					outcome="/restreint/ServiceInterne/listerServices" />
+				<p:menuitem value="#{lang['Ajouter_service']}"
+					outcome="/restreint/ServiceInterne/ajouterService" />
+			</p:submenu>
+			<p:submenu label="#{lang['employes']}">
+				<p:menuitem value="#{lang['lister_employes']}"
+					outcome="/restreint/Employe/listerEmployes" />
+				<p:menuitem value="#{lang['ajouter_employe']}"
+					outcome="/restreint/Employe/ajouterEmploye" />
+			</p:submenu>
+			<p:submenu label="#{lang['courriers_arrives']}">
+				<p:menuitem value="#{lang['boite_reception']} (#{connexion.nbrCourriers})  "
+					outcome="/restreint/CourrierArrive/boiteReception" />
+				<p:menuitem value="#{lang['espace_service']} (#{connexion.nbrCourriersService}) "
+					outcome="/restreint/CourrierArrive/espaceService" />
+				<p:menuitem value="#{lang['courriers_traites']}"
+					outcome="/restreint/CourrierArrive/courriersTraites">
+				</p:menuitem>
+			</p:submenu>
+			<p:submenu label="#{lang['recherche_avance']}">
+				<p:menuitem value="#{lang['recherche_archive']}" outcome="/restreint/CourrierArrive/RechercheArchive/rechercheAdmin" />
+                <p:menuitem value="#{lang['recherche_courriers']}" outcome="/restreint/CourrierArrive/recherche" />
+			</p:submenu>
+		</p:panelMenu>
+
+
+		<p:panelMenu style="width:500px;" id="user" rendered="#{connexion.employe.role=='USER'}">
+			<p:submenu label="#{lang['courriers_arrives']}">
+				<p:menuitem value="#{lang['boite_reception']} (#{connexion.nbrCourriers})  "
+					outcome="/restreint/CourrierArrive/boiteReception" />
+				<p:menuitem value="#{lang['espace_service']} (#{connexion.nbrCourriersService}) "
+					outcome="/restreint/CourrierArrive/espaceService" />
+				<p:menuitem value="#{lang['courriers_traites']}"
+					outcome="/restreint/CourrierArrive/courriersTraites">
+				</p:menuitem>
+			</p:submenu>
+			<p:submenu label="#{lang['recherche_avance']}">
+				<p:menuitem value="#{lang['recherche_courriers']}"
+					outcome="/restreint/CourrierArrive/recherche" />
+
+			</p:submenu>
+		</p:panelMenu>
+
+		<p:panelMenu style="width:500px;" id="abo" rendered="#{connexion.employe.role=='ABO'}">
+			<p:submenu label="Etablissement">
+				<p:menuitem value="#{lang['lister_etablissement']}"
+					outcome="/restreint/Etablissement/listerEtablissements" />
+				<p:menuitem value="#{lang['ajouter_etablissement']}"
+					outcome="/restreint/Etablissement/ajouterEtablissement" />
+			</p:submenu>
+			<p:submenu label="#{lang['service_externe']}">
+				<p:menuitem value="#{lang['lister_service_externe']}"
+					outcome="/restreint/ServiceExterne/listerServicesExternes" />
+				<p:menuitem value="#{lang['Ajouter_service']} Externe "
+					outcome="/restreint/ServiceExterne/ajouterServiceExterne" />
+			</p:submenu>
+			<p:submenu label="#{lang['personne_externe']}">
+				<p:menuitem value="#{lang['lister_personnes_externes']}"
+					outcome="/restreint/PersonneExterne/listerPersonnesExternes" />
+				<p:menuitem value="Ajouter Personne  Externe"
+					outcome="/restreint/PersonneExterne/ajouterPersonneExterne" />
+			</p:submenu>
+
+			<p:submenu label="#{lang['courriers_arrives']}">
+				<p:menuitem value="#{lang['boite_reception']} (#{connexion.nbrCourriers}) "
+					outcome="/restreint/CourrierArrive/boiteReception" />
+				<p:menuitem value="#{lang['espace_service']} (#{connexion.nbrCourriersService})"
+					outcome="/restreint/CourrierArrive/espaceService" />
+				<p:menuitem value="#{lang['courriers_traites']}"
+					outcome="/restreint/CourrierArrive/courriersTraites">
+				</p:menuitem>
+				<p:menuitem value="#{lang['cree_courrier_arrive']}"
+					outcome="/restreint/CourrierArrive/CreerCourrier/creerCourrierArrive" />
+				<p:menuitem value="#{lang['courriers_non_envoyes']}"
+					outcome="/restreint/CourrierArrive/CourrierNonEnvoye/courriersNonEnvoye" />
+			</p:submenu>
+			<p:submenu label="#{lang['courriers_departs']}">
+			<p:menuitem value="#{lang['cree_courrier_depart']}"
+					outcome="/restreint/CourrierDepart/creerCourrierDepart" />
+					<p:menuitem value="Lister #{lang['courriers_departs']}"
+					outcome="/restreint/CourrierDepart/listerCourriersDeparts" />
+			</p:submenu>
+			
+			
+			
+			<p:submenu label="#{lang['recherche_avance']}">
+				<p:menuitem value="#{lang['recherche_courriers']}"
+					outcome="/restreint/CourrierArrive/recherche" />
+
+			</p:submenu>
+		</p:panelMenu>
+	</h:form>
+</h:body>
+</html>
