@@ -19,4 +19,3 @@
 <img src="/GEC-Screenshots/8.png" width="75%" height="75%"/>
 <img src="/GEC-Screenshots/9.png" width="75%" height="75%"/>
 <img src="/GEC-Screenshots/10.png" width="75%" height="75%"/>
-<img src="/GEC-Screenshots/11.png" width="75%" height="75%"/>
